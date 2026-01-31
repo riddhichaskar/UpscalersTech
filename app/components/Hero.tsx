@@ -1,97 +1,117 @@
 "use client";
 
-import { motion } from "framer-motion";
-import AvatarShowcase from "./AvatarShowcase";
-import dynamic from "next/dynamic";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-// Dynamically import the 3D component to prevent SSR issues
-const CubeFloor3D = dynamic(() => import("./CubeFloor3D"), {
-  ssr: false,
-});
+export default function StructuralSingularityHero() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
-export default function Hero() {
+  // Mouse Tracking for 3D Interaction
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const springX = useSpring(mouseX, { damping: 30, stiffness: 200 });
+  const springY = useSpring(mouseY, { damping: 30, stiffness: 200 });
+
+  useEffect(() => {
+    setIsMounted(true);
+    const handleMove = (e: MouseEvent) => {
+      const { innerWidth, innerHeight } = window;
+      mouseX.set(e.clientX / innerWidth);
+      mouseY.set(e.clientY / innerHeight);
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [mouseX, mouseY]);
+
+  // Transform values for the 3D Abstract Object
+  const rotateX = useTransform(springY, [0, 1], [20, -20]);
+  const rotateY = useTransform(springX, [0, 1], [-20, 20]);
+
+  if (!isMounted) return <div className="min-h-screen bg-[#020308]" />;
+
+  const brand = [
+    { char: "U", color: "#6c7cff" },
+    { char: "P", color: "#8fa4ff" },
+    { char: "S", color: "#b3c2ff" },
+    { char: "C", color: "#d9e0ff" },
+    { char: "A", color: "#ffffff" },
+    { char: "L", color: "#6c7cff" },
+    { char: "E", color: "#8fa4ff" },
+    { char: "R", color: "#b3c2ff" },
+    { char: "S", color: "#d9e0ff" },
+  ];
+
   return (
-    <section className="relative min-h-screen pb-40 overflow-hidden bg-gradient-to-b from-[#0b0e17] via-[#0f1220] to-black text-white">
-      
-      {/* ================= HERO CONTENT ================= 
-          Note: pt-32 ensures the content starts below the fixed Navbar 
-      */}
-      <div className="relative z-20 mx-auto pt-32 md:pt-48 max-w-5xl text-center px-6">
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9 }}
-          className="text-5xl md:text-7xl font-bold leading-tight tracking-tight"
-        >
-          Welcome to{" "}
-          <span className="relative inline-block text-[#6c7cff]">
-            UpScalers Technology
-            <span className="absolute inset-0 -z-10 rounded-md border border-[#6c7cff]/40" />
-          </span>
-          <br />
-          <span className="text-white/90">Scaling Businesses Through Smart Technology</span>
-        </motion.h1>
+    <section 
+      ref={containerRef}
+      className="relative min-h-screen w-full bg-[#03040a] overflow-hidden flex flex-col items-center justify-center cursor-none"
+    >
+      {/* 1. THE GENERATIVE BACKGROUND MESH */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <div className="h-full w-full" style={{ 
+          backgroundImage: `linear-gradient(#6c7cff 0.5px, transparent 0.5px), linear-gradient(90deg, #6c7cff 0.5px, transparent 0.5px)`,
+          backgroundSize: '60px 60px' 
+        }} />
+      </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
-          className="mt-8 text-base md:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed"
-        >
-          We help organizations design, build, and optimize digital systems using
-          cloud, data, automation, and AI—so they can grow faster, operate
-          smarter, and stay future-ready.
-        </motion.p>
+      {/* 2. THE 3D ABSTRACT "LOGIC CRYSTAL" */}
+      <motion.div
+        style={{ rotateX, rotateY, perspective: 1000 }}
+        className="absolute z-10 w-[500px] h-[500px] flex items-center justify-center pointer-events-none"
+      >
+        <div className="relative w-64 h-64 border-2 border-[#6c7cff]/30 rounded-full animate-[spin_20s_linear_infinite]">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#6c7cff] rounded-full blur-sm" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full blur-sm" />
+        </div>
+        <div className="absolute w-40 h-40 border border-white/10 rounded-lg rotate-45 animate-[spin_15s_linear_infinite_reverse]" />
+      </motion.div>
 
-        {/* MAIN CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-10 flex justify-center"
-        >
-          <button className="group relative rounded-full bg-gradient-to-r from-[#6c7cff] to-[#8fa4ff] px-10 py-4 text-sm font-bold shadow-xl transition-all hover:scale-105 hover:shadow-[#6c7cff]/20">
-            Talk to an Expert
-          </button>
+      {/* 3. MULTI-COLOR KINETIC TYPOGRAPHY */}
+      <div className="relative z-20 flex select-none">
+        {brand.map((item, idx) => (
+          <motion.span
+            key={idx}
+            whileHover={{ 
+              y: -20, 
+              color: item.color,
+              filter: `drop-shadow(0 0 25px ${item.color})`
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 10 }}
+            className="text-[12vw] font-black text-white/90 uppercase tracking-tighter leading-none px-1 transition-colors duration-300"
+          >
+            {item.char}
+          </motion.span>
+        ))}
+      </div>
+
+      {/* 4. STRATEGIC NARRATIVE */}
+      <div className="relative z-20 mt-16 text-center max-w-4xl px-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.8em] text-[#6c7cff] mb-8">
+            Engineering.Intelligence.Studio
+          </p>
+          <h2 className="text-xl md:text-2xl font-light text-slate-400 leading-relaxed italic">
+            "Transforming <span className="text-white font-bold">Spark</span> curiosity into <span className="text-white font-bold">AI Prime</span> mastery. We build the architecture that powers the next generation of automation."
+          </h2>
         </motion.div>
       </div>
 
-      {/* ================= VISUAL SHOWCASE ================= */}
-      <div className="relative z-20 mt-12">
-        <AvatarShowcase />
+      {/* 5. LIVE SYSTEM TELEMETRY */}
+      <div className="absolute bottom-12 left-12 hidden lg:block opacity-20">
+        <div className="font-mono text-[9px] text-white space-y-1 tracking-[0.4em] uppercase">
+          <p>Sector: AI_Automation_Services</p>
+          <p>Protocol: SkillEdge_Active</p>
+        </div>
       </div>
 
-      {/* ================= FLOATING UI CARDS ================= */}
-      {/* Left Card */}
-      <motion.div
-        animate={{ y: [0, -12, 0] }}
-        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-        className="absolute left-6 md:left-14 bottom-44 z-30 hidden sm:block rounded-xl bg-white/5 px-5 py-4 backdrop-blur-md border border-white/10 shadow-2xl"
+      {/* 6. MINIMALIST KINETIC CURSOR */}
+      <motion.div 
+        style={{ x: springX, y: springY, translateX: "-50%", translateY: "-50%" }}
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-[#6c7cff]/50 pointer-events-none z-[100] flex items-center justify-center backdrop-blur-sm"
       >
-        <p className="text-xs font-semibold uppercase tracking-wider text-blue-400">Capabilities</p>
-        <p className="text-sm mt-1 text-white">Cloud • Data • AI</p>
-        <div className="mt-3 h-1.5 w-28 rounded-full bg-gradient-to-r from-blue-400 to-purple-400" />
+        <div className="h-1 w-1 bg-white rounded-full" />
       </motion.div>
-
-      {/* Right Card */}
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-        className="absolute right-6 md:right-16 bottom-52 z-30 hidden sm:block rounded-xl bg-white/5 px-5 py-4 backdrop-blur-md border border-white/10 shadow-2xl"
-      >
-        <p className="text-xs font-semibold uppercase tracking-wider text-purple-400">Digital Engineering</p>
-        <p className="mt-1 text-xs text-gray-300 max-w-[160px] leading-snug">
-          Scalable, secure, and future-ready digital systems.
-        </p>
-      </motion.div>
-
-      {/* ================= 3D ANIMATED FLOOR ================= */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        <CubeFloor3D />
-      </div>
-
-      {/* Background Decorative Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#6c7cff]/10 blur-[120px] rounded-full -z-10" />
     </section>
   );
 }

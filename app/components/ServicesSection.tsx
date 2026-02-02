@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -20,7 +21,7 @@ const SERVICES = [
     color: "text-blue-600",
     border: "group-hover:border-blue-500/50",
     href: "/services/digital-engineering",
-    span: "md:col-span-2", // Larger card
+    span: "md:col-span-2",
   },
   {
     title: "AI & Machine Learning",
@@ -45,7 +46,7 @@ const SERVICES = [
     color: "text-emerald-600",
     border: "group-hover:border-emerald-500/50",
     href: "/services/data-analytics",
-    span: "md:col-span-2", // Larger card
+    span: "md:col-span-2",
   },
   {
     title: "Automation",
@@ -66,12 +67,25 @@ const SERVICES = [
 ];
 
 export default function ServicesSection() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // This ensures the ID is only attached once the client-side React is ready
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
-    <section className="relative overflow-hidden bg-white py-32 font-sans">
+    <section 
+      id={isMounted ? "services" : undefined} 
+      className="relative overflow-hidden bg-white py-32 font-sans"
+    >
       {/* ================= BACKGROUND SYSTEM ================= */}
-      {/* Refined Dot Matrix Pattern */}
-      <div className="absolute inset-0 z-0 opacity-40" 
-        style={{ backgroundImage: `radial-gradient(#e5e7eb 1px, transparent 1px)`, backgroundSize: '32px 32px' }} 
+      <div 
+        className="absolute inset-0 z-0 opacity-40" 
+        style={{ 
+          backgroundImage: `radial-gradient(#e5e7eb 1px, transparent 1px)`, 
+          backgroundSize: '32px 32px' 
+        }} 
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
@@ -114,9 +128,13 @@ export default function ServicesSection() {
                 transition={{ delay: i * 0.1 }}
                 className={`group relative overflow-hidden rounded-[2.5rem] border border-slate-100 bg-slate-50/50 p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 ${service.span || ""} ${service.border}`}
               >
-                {/* 1. Subtle Engineering Grid Overlay (Reveals on Hover) */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none"
-                  style={{ backgroundImage: `linear-gradient(#6c7cff 1px, transparent 1px), linear-gradient(90deg, #6c7cff 1px, transparent 1px)`, backgroundSize: '20px 20px' }}
+                {/* 1. Engineering Grid Overlay */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none"
+                  style={{ 
+                    backgroundImage: `linear-gradient(#6c7cff 1px, transparent 1px), linear-gradient(90deg, #6c7cff 1px, transparent 1px)`, 
+                    backgroundSize: '20px 20px' 
+                  }}
                 />
 
                 {/* 2. Top Navigation Element */}

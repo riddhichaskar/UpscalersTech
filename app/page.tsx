@@ -7,6 +7,7 @@ import WhyUpscalerSection from "./components/WhyUpscalerSection";
 import ServicesSection from "./components/ServicesSection";
 import CTASection from "./components/CTASection";
 import CourseSection from "./components/CourseSection";
+import {HeroExp} from "./components/hero_exp";
 
 import { LayoutGroup } from "framer-motion";
 
@@ -16,7 +17,8 @@ export default function Home() {
       <Navbar />
 
       {/* Shared layout context for cross-section animation */}
-        <Hero />
+      <HeroExp />
+        {/* <Hero /> */}
         <TechnologySection />
       {/* Normal sections (no shared motion needed) */}
       <WhyUpscalerSection />

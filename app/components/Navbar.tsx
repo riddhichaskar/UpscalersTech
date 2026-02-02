@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { ChevronDown, Sun, Moon, Menu, X, Home } from "lucide-react";
+import { ChevronDown, Sun, Moon, Menu, X, Home, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const services = [
@@ -24,6 +24,7 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileMenuTab, setMobileMenuTab] = useState<'main' | 'services' | 'courses'>('main');
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,12 +47,9 @@ export default function Navbar() {
         bg-white/80 dark:bg-[#0b0e17]/70 backdrop-blur-xl border-b border-slate-200 dark:border-white/10">
         
         <div className="flex items-center gap-6">
-          {/* LOGO */}
           <Link href="/" className="text-xl font-black tracking-tighter text-slate-900 dark:text-white uppercase">
             UPSCALERS<span className="text-[#6c7cff]">.</span>
           </Link>
-
-          {/* HOME ICON */}
           <Link href="/" className="hidden md:flex p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-[#6c7cff] hover:bg-[#6c7cff]/10 transition-all border border-transparent hover:border-[#6c7cff]/20">
             <Home size={18} />
           </Link>
@@ -114,6 +112,9 @@ export default function Navbar() {
           </li>
 
           <li className="py-2 hover:text-[#6c7cff] transition-colors">
+            <Link href="/career">Careers</Link>
+          </li>
+          <li className="py-2 hover:text-[#6c7cff] transition-colors">
             <Link href="/aboutus">About Us</Link>
           </li>
         </ul>
@@ -124,7 +125,7 @@ export default function Navbar() {
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 hover:border-[#6c7cff] transition-all"
           >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            {mounted && theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
           <Link href="/contact" className="hidden sm:block">
@@ -135,7 +136,7 @@ export default function Navbar() {
 
           <button 
             className="lg:hidden p-2 text-slate-900 dark:text-white"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => { setIsOpen(!isOpen); setMobileMenuTab('main'); }}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -149,15 +150,43 @@ export default function Navbar() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="fixed inset-0 z-[90] lg:hidden bg-white dark:bg-[#0b0e17] pt-28 px-8"
+            className="fixed inset-0 z-[90] lg:hidden bg-white dark:bg-[#0b0e17] pt-28 px-8 flex flex-col"
           >
-            <div className="flex flex-col gap-8 text-3xl font-black uppercase tracking-tighter">
-              <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-4 py-2 border-b border-slate-100 dark:border-white/5">
-                <Home size={28} /> Home
-              </Link>
-              <Link href="/aboutus" onClick={() => setIsOpen(false)} className="py-2 border-b border-slate-100 dark:border-white/5">About Us</Link>
-              <Link href="/contact" onClick={() => setIsOpen(false)} className="py-2 text-[#6c7cff]">Contact Us</Link>
-            </div>
+            {mobileMenuTab === 'main' && (
+              <div className="flex flex-col gap-6 text-2xl font-black uppercase tracking-tighter">
+                <button onClick={() => setMobileMenuTab('services')} className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/5">
+                  Services <ChevronRight size={20} />
+                </button>
+                <button onClick={() => setMobileMenuTab('courses')} className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/5">
+                  Courses <ChevronRight size={20} />
+                </button>
+                <Link href="/career" onClick={() => setIsOpen(false)} className="py-4 border-b border-slate-100 dark:border-white/5">Careers</Link>
+                <Link href="/aboutus" onClick={() => setIsOpen(false)} className="py-4 border-b border-slate-100 dark:border-white/5">About Us</Link>
+                <Link href="/contact" onClick={() => setIsOpen(false)} className="py-4 text-[#6c7cff]">Contact Us</Link>
+              </div>
+            )}
+
+            {mobileMenuTab === 'services' && (
+              <div className="flex flex-col gap-4">
+                <button onClick={() => setMobileMenuTab('main')} className="text-[#6c7cff] font-black uppercase tracking-widest text-xs mb-8 flex items-center gap-2">
+                  ← Back to Menu
+                </button>
+                {services.map(s => (
+                  <Link key={s.name} href={s.href} onClick={() => {setIsOpen(false); setMobileMenuTab('main');}} className="text-xl font-bold py-2">{s.name}</Link>
+                ))}
+              </div>
+            )}
+
+            {mobileMenuTab === 'courses' && (
+              <div className="flex flex-col gap-4">
+                <button onClick={() => setMobileMenuTab('main')} className="text-[#6c7cff] font-black uppercase tracking-widest text-xs mb-8 flex items-center gap-2">
+                  ← Back to Menu
+                </button>
+                {courses.map(c => (
+                  <Link key={c.name} href={c.href} onClick={() => {setIsOpen(false); setMobileMenuTab('main');}} className="text-xl font-bold py-2">{c.name}</Link>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

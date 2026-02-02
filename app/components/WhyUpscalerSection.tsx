@@ -112,9 +112,9 @@ export default function TechnologySection() {
                     <Zap size={14} className="text-yellow-500" /> Throughput: High
                 </div>
             </div>
-            <button className="group flex items-center gap-4 px-8 py-3 rounded-full bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-[#6c7cff] hover:text-white transition-all">
+            {/* <button className="group flex items-center gap-4 px-8 py-3 rounded-full bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-[#6c7cff] hover:text-white transition-all">
                 Audit System <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </button> */}
         </div>
       </div>
     </section>

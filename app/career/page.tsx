@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, Variants, useScroll, useTransform } from "framer-motion";
+import { motion, Variants, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { 
   Rocket, 
   Users, 
@@ -9,9 +9,11 @@ import {
   Briefcase, 
   Globe, 
   Trophy,
-  Cpu
+  Cpu,
+  CheckCircle2,
+  X
 } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const textVariant: Variants = {
   hidden: { y: "100%", opacity: 0 },
@@ -45,6 +47,9 @@ const OPEN_ROLES = [
 
 export default function CareerPage() {
   const containerRef = useRef<HTMLElement>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [fileName, setFileName] = useState("");
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -52,9 +57,42 @@ export default function CareerPage() {
 
   const yCircle = useTransform(scrollYProgress, [0, 1], [0, 400]);
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      setShowToast(true);
+      // Auto-hide toast after 4 seconds
+      setTimeout(() => setShowToast(false), 4000);
+    }
+  };
+
   return (
     <section ref={containerRef} className="relative min-h-screen bg-[#f8fafc] dark:bg-[#090b14] text-slate-900 dark:text-white transition-colors duration-500 overflow-hidden">
       
+      {/* ================= TOAST NOTIFICATION ================= */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 20, x: "-50%" }}
+            className="fixed bottom-10 left-1/2 z-[200] flex items-center gap-3 px-6 py-4 bg-white dark:bg-[#1a1f35] border border-emerald-500/30 rounded-2xl shadow-2xl backdrop-blur-xl"
+          >
+            <CheckCircle2 className="text-emerald-500" size={20} />
+            <div className="flex flex-col">
+              <p className="text-sm font-bold">Resume Uploaded</p>
+              <p className="text-[10px] text-slate-500 dark:text-gray-400 font-mono truncate max-w-[150px] uppercase">
+                {fileName}
+              </p>
+            </div>
+            <button onClick={() => setShowToast(false)} className="ml-4 p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-all">
+              <X size={14} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ================= BACKGROUND DECOR ================= */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute top-[5%] left-[-2%] text-[18vw] font-black text-slate-200 dark:text-white/[0.02] select-none leading-none uppercase">
@@ -104,7 +142,7 @@ export default function CareerPage() {
         </div>
       </div>
 
-      {/* ================= ASYMMETRIC GRID: OPPORTUNITIES ================= */}
+      {/* ================= OPPORTUNITIES & AUTONOMY ================= */}
       <div className="relative mx-auto max-w-7xl px-6 py-24">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           <motion.div 
@@ -140,6 +178,7 @@ export default function CareerPage() {
                 <p className="text-xl text-slate-500 dark:text-gray-400 mb-10 leading-relaxed">
                   We operate with high trust and low bureaucracy. You own your stack, your schedule, and your impact.
                 </p>
+                
                 <div className="grid grid-cols-2 gap-6">
                   <div className="p-6 rounded-2xl bg-slate-100 dark:bg-white/5 border border-transparent hover:border-[#6c7cff]/20 transition-all">
                     <Globe size={24} className="text-[#6c7cff] mb-4" />
@@ -149,6 +188,21 @@ export default function CareerPage() {
                     <Trophy size={24} className="text-[#6c7cff] mb-4" />
                     <h5 className="font-bold">Equity Stakes</h5>
                   </div>
+                </div>
+
+                {/* RESUME UPLOAD BLOCK */}
+                <div className="mt-10 p-8 rounded-[2rem] border border-dashed border-slate-300 dark:border-white/10 bg-[#6c7cff]/5 flex flex-col items-center text-center group hover:border-[#6c7cff]/50 transition-all">
+                  <Briefcase size={32} className="text-[#6c7cff] mb-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <h4 className="text-xl font-bold mb-2">Send us your resume!</h4>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 mb-6 max-w-[280px]">
+                    Upload your resume and we'll reach out when a matching role opens.
+                  </p>
+                  <label className="relative cursor-pointer">
+                    <input type="file" className="hidden" onChange={handleFileUpload} accept=".pdf,.doc,.docx" />
+                    <div className="px-8 py-3 rounded-full bg-slate-900 dark:bg-[#6c7cff] text-white text-xs font-black uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all">
+                      Upload Resume
+                    </div>
+                  </label>
                 </div>
              </motion.div>
           </div>
